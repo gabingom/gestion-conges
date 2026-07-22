@@ -86,12 +86,20 @@ class Agent extends Model
     }
 
     /**
-     * Total des jours de congé annuel acquis :
-     * 24 jours par année de service, plafonné à 72 jours (3 ans),
-     * augmenté du bonus enfants.
+     * Total des jours de congé annuel acquis.
+     *
+     * Aucun droit n'est ouvert avant 1 année de service accomplie :
+     * ni les 24 jours annuels, ni le bonus pour enfants à charge.
+     * Au-delà : 24 jours par année, plafonné à 72 jours (3 ans),
+     * augmenté d'un jour par enfant de moins de 14 ans (mères).
      */
     public function joursAcquis(): int
     {
+        // Droits non encore ouverts -> aucun jour acquis
+        if (!$this->aUnAnDeService()) {
+            return 0;
+        }
+
         $acquis = $this->anneesService() * self::DROIT_ANNUEL;
         $acquis = min($acquis, self::CUMUL_MAX);
 

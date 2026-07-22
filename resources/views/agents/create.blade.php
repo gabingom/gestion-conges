@@ -54,10 +54,17 @@
                     @error('type_agent') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Nombre d'enfants</label>
+                    <label class="form-label">
+                        Nombre d'enfants <span class="text-danger">de moins de 14 ans</span>
+                    </label>
                     <input type="number" name="nombre_enfants" class="form-control @error('nombre_enfants') is-invalid @enderror"
-                        value="{{ old('nombre_enfants', 0) }}" min="0">
-                    <small class="text-muted">+1 jour/enfant automatiquement pour les femmes</small>
+                        value="{{ old('nombre_enfants', 0) }}" min="0" placeholder="Enfants de moins de 14 ans uniquement">
+                    <small class="text-muted d-block">
+                        <i class="bi bi-exclamation-circle text-danger"></i>
+                        <strong>Ne comptez que les enfants âgés de moins de 14 ans.</strong>
+                        Chaque enfant déclaré ouvre droit à 1 jour de congé supplémentaire pour les agents de sexe féminin,
+                        applicable après 1 an de service.
+                    </small>
                     @error('nombre_enfants') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-6">

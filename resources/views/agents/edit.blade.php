@@ -54,8 +54,10 @@
                     @error('type_agent') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label">Nombre d'enfants</label>
-                    <input type="number" name="nombre_enfants" class="form-control @error('nombre_enfants') is-invalid @enderror"
+                    <label class="form-label">
+                        Nombre d'enfants <span class="text-danger">de moins de 14 ans</span>
+                    </label>
+                    <input type="number" name="nombre_enfants" placeholder="Enfants de moins de 14 ans uniquement" class="form-control @error('nombre_enfants') is-invalid @enderror"
                         value="{{ old('nombre_enfants', $agent->nombre_enfants) }}" min="0">
                     @error('nombre_enfants') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>

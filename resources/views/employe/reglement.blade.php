@@ -27,7 +27,11 @@
                 <div class="small text-muted mt-1">Année(s) de service</div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="fw-bold text-success" style="font-size:1.8rem;line-height:1;">{{ $agent->joursAcquis() }}</div>
+                @if($agent->aUnAnDeService())
+                    <div class="fw-bold text-success" style="font-size:1.8rem;line-height:1;">{{ $agent->joursAcquis() }}</div>
+                @else
+                    <div class="fw-bold" style="font-size:1.8rem;line-height:1;color:#c9ccd4;"><i class="bi bi-lock-fill"></i></div>
+                @endif
                 <div class="small text-muted mt-1">Jours acquis</div>
             </div>
             <div class="col-6 col-md-3">
@@ -35,14 +39,19 @@
                 <div class="small text-muted mt-1">Jours consommés</div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="fw-bold" style="font-size:1.8rem;line-height:1;color:var(--accent);">{{ $agent->soldeDisponible() }}</div>
+                @if($agent->aUnAnDeService())
+                    <div class="fw-bold" style="font-size:1.8rem;line-height:1;color:var(--accent);">{{ $agent->soldeDisponible() }}</div>
+                @else
+                    <div class="fw-bold" style="font-size:1.8rem;line-height:1;color:#c9ccd4;"><i class="bi bi-lock-fill"></i></div>
+                @endif
                 <div class="small text-muted mt-1">Solde disponible</div>
             </div>
         </div>
 
         @unless($agent->aUnAnDeService())
-            <div class="alert alert-warning mt-3 mb-0 py-2 small">
-                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            <div class="alert alert-danger mt-3 mb-0 py-2 small">
+                <i class="bi bi-lock-fill me-1"></i>
+                <strong>Droits non encore ouverts.</strong>
                 Vous n'avez pas encore accompli 1 an de service : vous ne pouvez pas demander de congé annuel.
                 @if($agent->dateOuvertureDroit())
                     Vos droits s'ouvriront le <strong>{{ $agent->dateOuvertureDroit()->format('d/m/Y') }}</strong>.
@@ -71,7 +80,7 @@
             <li>Aucun congé annuel ne peut être demandé avant <strong>1 année de service accomplie</strong>.</li>
             <li>Après une année de service, l'employé a droit à <strong>24 jours de congé</strong> chaque année.</li>
             <li>Le cumul des congés est plafonné à <strong>72 jours</strong>, soit l'équivalent de 3 années de service.</li>
-            <li>Une employée mère d'enfants de moins de 14 ans bénéficie d'<strong>un jour de congé supplémentaire par enfant</strong>.</li>
+            <li>Une employée mère d'enfants de <strong>moins de 14 ans</strong> bénéficie d'un jour de congé supplémentaire par enfant. Ce bonus n'est acquis qu'une fois la première année de service accomplie.</li>
         </ul>
     </div>
 </div>

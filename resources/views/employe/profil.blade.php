@@ -79,23 +79,69 @@
             <h5 class="fw-bold mb-3" style="color:var(--dark);font-size:1rem;">
                 <i class="bi bi-calculator text-muted me-2"></i> Situation des congés
             </h5>
-            <div class="row text-center my-1">
-                <div class="col-4 border-end">
-                    <div class="fw-bold text-success" style="font-size:2rem;line-height:1.1;">{{ $agent->joursAcquis() }}</div>
-                    <div class="small fw-semibold mt-1" style="font-size:.75rem;color:var(--text-muted);">Jours acquis</div>
+            @if(!$agent->aUnAnDeService())
+                {{-- Droits non encore ouverts : compteurs verrouillés --}}
+                <div class="row text-center my-1">
+                    <div class="col-4 border-end">
+                        <div class="fw-bold" style="font-size:2rem;line-height:1.1;color:#c9ccd4;">
+                            <i class="bi bi-lock-fill"></i>
+                        </div>
+                        <div class="small fw-semibold mt-1" style="font-size:.75rem;color:var(--text-muted);">Jours acquis</div>
+                    </div>
+                    <div class="col-4 border-end">
+                        <div class="fw-bold" style="font-size:2rem;line-height:1.1;color:#c9ccd4;">
+                            <i class="bi bi-lock-fill"></i>
+                        </div>
+                        <div class="small fw-semibold mt-1" style="font-size:.75rem;color:var(--text-muted);">Jours consommés</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold" style="font-size:2rem;line-height:1.1;color:#c9ccd4;">
+                            <i class="bi bi-lock-fill"></i>
+                        </div>
+                        <div class="small fw-semibold mt-1" style="font-size:.75rem;color:var(--text-muted);">Solde disponible</div>
+                    </div>
                 </div>
-                <div class="col-4 border-end">
-                    <div class="fw-bold text-secondary" style="font-size:2rem;line-height:1.1;">{{ $agent->joursConsommes() }}</div>
-                    <div class="small fw-semibold mt-1" style="font-size:.75rem;color:var(--text-muted);">Jours consommés</div>
+
+                <div class="alert alert-danger mt-3 mb-0 py-2 small">
+                    <i class="bi bi-lock-fill me-1"></i>
+                    <strong>Droits non encore ouverts.</strong>
+                    Le congé annuel n'est accessible qu'après <strong>1 année de service accomplie</strong>.
+                    @if($agent->dateOuvertureDroit())
+                        Vos droits seront ouverts le <strong>{{ $agent->dateOuvertureDroit()->format('d/m/Y') }}</strong>.
+                    @endif
+                    @if($agent->bonusEnfants() > 0)
+                        <br>
+                        <span class="text-muted">
+                            Le bonus de {{ $agent->bonusEnfants() }} jour(s) lié à vos enfants de moins de 14 ans
+                            sera ajouté à cette date.
+                        </span>
+                    @endif
                 </div>
-                <div class="col-4">
-                    <div class="fw-bold" style="font-size:2rem;line-height:1.1;color:var(--accent);">{{ $agent->soldeDisponible() }}</div>
-                    <div class="small fw-semibold mt-1" style="font-size:.75rem;color:var(--text-muted);">Solde disponible</div>
+            @else
+                <div class="row text-center my-1">
+                    <div class="col-4 border-end">
+                        <div class="fw-bold text-success" style="font-size:2rem;line-height:1.1;">{{ $agent->joursAcquis() }}</div>
+                        <div class="small fw-semibold mt-1" style="font-size:.75rem;color:var(--text-muted);">Jours acquis</div>
+                    </div>
+                    <div class="col-4 border-end">
+                        <div class="fw-bold text-secondary" style="font-size:2rem;line-height:1.1;">{{ $agent->joursConsommes() }}</div>
+                        <div class="small fw-semibold mt-1" style="font-size:.75rem;color:var(--text-muted);">Jours consommés</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold" style="font-size:2rem;line-height:1.1;color:var(--accent);">{{ $agent->soldeDisponible() }}</div>
+                        <div class="small fw-semibold mt-1" style="font-size:.75rem;color:var(--text-muted);">Solde disponible</div>
+                    </div>
                 </div>
-            </div>
+                @if($agent->bonusEnfants() > 0)
+                    <div class="text-center small text-muted mt-2">
+                        Dont {{ $agent->bonusEnfants() }} jour(s) au titre des enfants de moins de 14 ans.
+                    </div>
+                @endif
+            @endif
+
             <div class="text-center small text-muted mt-3">
                 {{ $agent->anneesService() }} année(s) de service —
-                <a href="{{ route('employe.reglement') }}">voir le règlement intérieur</a>
+                <a href="{{ route('employe.reglement') }}">voir le code du travail</a>
             </div>
         </div>
     </div>

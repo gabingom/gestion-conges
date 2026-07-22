@@ -22,14 +22,19 @@
                 <a href="{{ route('employe.reglement') }}">Consulter le code du travail</a>
             </div>
             <div class="text-center">
-                <div class="fw-bold" style="font-size:1.5rem;line-height:1;color:var(--accent);">{{ $agent->soldeDisponible() }}</div>
+                @if($agent->aUnAnDeService())
+                    <div class="fw-bold" style="font-size:1.5rem;line-height:1;color:var(--accent);">{{ $agent->soldeDisponible() }}</div>
+                @else
+                    <div class="fw-bold" style="font-size:1.5rem;line-height:1;color:#c9ccd4;"><i class="bi bi-lock-fill"></i></div>
+                @endif
                 <div class="small text-muted">Solde disponible</div>
             </div>
         </div>
 
         @unless($agent->aUnAnDeService())
-            <div class="alert alert-warning mt-3 mb-0 py-2 small">
-                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            <div class="alert alert-danger mt-3 mb-0 py-2 small">
+                <i class="bi bi-lock-fill me-1"></i>
+                <strong>Droits non encore ouverts.</strong>
                 Vous n'avez pas encore 1 an de service : toute demande de <strong>congé annuel</strong> sera refusée par la plateforme.
                 @if($agent->dateOuvertureDroit())
                     Droits ouverts le <strong>{{ $agent->dateOuvertureDroit()->format('d/m/Y') }}</strong>.
