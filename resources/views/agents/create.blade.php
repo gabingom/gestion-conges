@@ -38,7 +38,7 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label">Sexe</label>
-                    <select name="sexe" class="form-select @error('sexe') is-invalid @enderror">
+                    <select name="sexe" id="sexe" onchange="majEnfants()" class="form-select @error('sexe') is-invalid @enderror">
                         <option value="">-- Sélectionner --</option>
                         <option value="homme" {{ old('sexe') == 'homme' ? 'selected' : '' }}>Homme</option>
                         <option value="femme" {{ old('sexe') == 'femme' ? 'selected' : '' }}>Femme</option>
@@ -54,6 +54,17 @@
                     @error('type_agent') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
                 <div class="col-md-6">
+                    <label class="form-label">Adresse e-mail <span class="text-danger">*</span></label>
+                    <input type="email" name="email" class="form-control @error('email') is-invalid @enderror"
+                        value="{{ old('email') }}" placeholder="Ex: aminata.diallo@gmail.com" required>
+                    <small class="text-muted d-block">
+                        <i class="bi bi-envelope text-danger"></i>
+                        Les identifiants de connexion seront envoyés à cette adresse. Vérifiez-la avant d'enregistrer.
+                    </small>
+                    @error('email') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="col-md-6" id="bloc_enfants">
                     <label class="form-label">
                         Nombre d'enfants <span class="text-danger">de moins de 14 ans</span>
                     </label>
@@ -107,4 +118,23 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    function majEnfants() {
+        var sexe = document.getElementById('sexe').value;
+        var bloc = document.getElementById('bloc_enfants');
+        var champ = bloc.querySelector('[name=nombre_enfants]');
+
+        // Le nombre d'enfants n'ouvre aucun droit pour les agents de sexe masculin
+        if (sexe === 'homme') {
+            bloc.style.display = 'none';
+            champ.value = 0;
+        } else {
+            bloc.style.display = '';
+        }
+    }
+    document.addEventListener('DOMContentLoaded', majEnfants);
+</script>
+@endpush
 @endsection

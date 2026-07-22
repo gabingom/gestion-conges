@@ -7,6 +7,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
+use App\Mail\IdentifiantsAgent;
 
 class AgentController extends Controller
 {
@@ -42,11 +45,11 @@ class AgentController extends Controller
             'nombre_enfants'     => 'nullable|integer|min:0',
             'lieu_affectation'   => 'required|string|max:255',
             'date_prise_service' => 'required|date',
-            'email'              => 'nullable|email|max:255|unique:users,email',
+            'email'              => 'required|email|max:255|unique:users,email',
         ]);
 
-        // 1) Identifiant de connexion : email fourni, sinon généré automatiquement
-        $email = $request->email ?: $this->genererEmail($request->prenom, $request->nom);
+        // 1) Identifiant de connexion : l'adresse réelle de l'agent
+        $email = $request->email;
 
         // 2) Mot de passe temporaire
         $motDePasse = Str::password(10, true, true, false);
@@ -57,6 +60,7 @@ class AgentController extends Controller
             'email'    => $email,
             'password' => Hash::make($motDePasse),
             'role'     => 'employe',
+            'must_change_password' => true,   // devra le changer à la 1re connexion
         ]);
 
         // 4) Création de la fiche agent liée
@@ -72,9 +76,26 @@ class AgentController extends Controller
             'date_prise_service' => $request->date_prise_service,
         ]);
 
-        // 5) On renvoie vers la fiche en affichant les identifiants UNE SEULE FOIS
+        // 5) Envoi des identifiants par courriel
+        $envoye = true;
+        try {
+            Mail::to($email)->send(new IdentifiantsAgent(
+                $request->prenom . ' ' . $request->nom,
+                $email,
+                $motDePasse,
+                route('login')
+            ));
+        } catch (\Throwable $e) {
+            $envoye = false;
+            Log::error("Envoi des identifiants impossible pour {$email} : " . $e->getMessage());
+        }
+
+        // 6) Retour vers la fiche, avec les identifiants affichés une seule fois
         return redirect()->route('agents.show', $agent->id)
-            ->with('success', 'Agent créé avec succès ! Le compte de connexion a été généré.')
+            ->with('success', $envoye
+                ? "Agent créé. Les identifiants ont été envoyés à {$email}."
+                : "Agent créé, mais l'envoi du courriel a échoué. Communiquez les identifiants manuellement.")
+            ->with('mail_envoye', $envoye)
             ->with('new_account_email', $email)
             ->with('new_account_password', $motDePasse);
     }
@@ -137,18 +158,4 @@ class AgentController extends Controller
             ->with('success', 'L\'agent a été supprimé avec succès !');
     }
 
-    /**
-     * Génère un identifiant de connexion unique du type prenom.nom@ussein.local
-     */
-    private function genererEmail(string $prenom, string $nom): string
-    {
-        $base = Str::slug($prenom . '.' . $nom, '.');
-        $email = $base . '@ussein.local';
-        $i = 1;
-        while (User::where('email', $email)->exists()) {
-            $email = $base . $i . '@ussein.local';
-            $i++;
-        }
-        return $email;
-    }
 }

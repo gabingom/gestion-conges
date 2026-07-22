@@ -23,8 +23,22 @@
         <h5 class="fw-bold mb-2" style="color:var(--dark);">
             <i class="bi bi-key-fill text-danger me-2"></i> Identifiants de connexion de l'employé
         </h5>
+        @if(session('mail_envoye'))
+            <div class="alert alert-success py-2 small mb-3">
+                <i class="bi bi-envelope-check-fill me-1"></i>
+                Ces identifiants ont été <strong>envoyés par courriel</strong> à l'agent.
+                Il devra changer son mot de passe dès sa première connexion.
+            </div>
+        @else
+            <div class="alert alert-warning py-2 small mb-3">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                <strong>L'envoi du courriel a échoué.</strong>
+                Communiquez ces identifiants à l'agent par un autre moyen.
+            </div>
+        @endif
         <p class="small text-muted mb-3">
-            Communiquez ces informations à l'agent. Le mot de passe ne sera plus affiché par la suite.
+            Le mot de passe ne sera plus affiché par la suite. Il est provisoire :
+            l'agent devra le remplacer à sa première connexion.
         </p>
         <div class="row g-3">
             <div class="col-md-6">

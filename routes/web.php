@@ -9,6 +9,7 @@ use App\Http\Controllers\JourFerieController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RapportController;
 use App\Http\Controllers\EmployeController;
+use App\Http\Controllers\PasswordController;
 
 // Redirection racine vers login
 Route::get('/', function () {
@@ -20,12 +21,18 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+// Changement du mot de passe provisoire (obligatoire à la 1re connexion)
+Route::middleware('auth')->group(function () {
+    Route::get('/changer-mot-de-passe', [PasswordController::class, 'edit'])->name('password.change');
+    Route::post('/changer-mot-de-passe', [PasswordController::class, 'update'])->name('password.update');
+});
+
 /*
 |--------------------------------------------------------------------------
 | BACK-OFFICE (admin / gestionnaire) — inchangé
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:admin,gestionnaire'])->group(function () {
+Route::middleware(['auth', 'must.change.password', 'role:admin,gestionnaire'])->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -61,7 +68,7 @@ Route::middleware(['auth', 'role:admin,gestionnaire'])->group(function () {
 | ESPACE EMPLOYÉ
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:employe'])->prefix('employe')->name('employe.')->group(function () {
+Route::middleware(['auth', 'must.change.password', 'role:employe'])->prefix('employe')->name('employe.')->group(function () {
 
     // Mon profil (lecture seule)
     Route::get('/mon-profil', [EmployeController::class, 'profil'])->name('profil');
